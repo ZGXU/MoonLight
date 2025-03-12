@@ -1,0 +1,363 @@
+local ReGui = loadstring(game:HttpGet('https://raw.githubusercontent.com/depthso/Dear-ReGui/refs/heads/main/ReGui.lua'))()
+local PrefabsId = `rbxassetid://{ReGui.PrefabsId}`
+
+--// Externally import the Prefabs asset
+ReGui:Init({
+	Prefabs = game:GetService("InsertService"):LoadLocalAsset(PrefabsId)
+})
+
+
+
+
+local Window = ReGui:Window({
+	Title = "Key system",
+	Size = UDim2.fromOffset(300, 100),
+	NoCollapse = true,
+	NoResize = true,
+	NoClose = true
+})
+
+local Key = Window:InputText({
+	Label = "Key",
+	PlaceHolder = "Key here",
+	Value = "",
+})
+
+Window:Button({
+	Text = "Enter",
+	Callback = function()
+		-- Successful
+		if Key:GetValue() == "MoonLightTop" then
+		Window:Close()
+			do --// Tabs window demo
+	
+	
+
+
+
+
+
+
+type RadioButton = {
+	Label: string?,
+	IsRadio: boolean?,
+	Value: boolean,
+	NoAnimation: boolean?,
+	Callback: ((...any) -> unknown)?,
+	SetTicked: (self: Checkbox, Value: boolean, NoAnimation: boolean) -> ...any,
+	Toggle: (self: Checkbox) -> ...any
+}
+	
+
+
+
+
+	--aimbot
+	local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+local FOV_RADIUS = 100
+local AIMBOT_ENABLED = false
+local fovCircle
+
+-- Zmienne do przechowywania połączeń
+local renderSteppedConnection
+local inputBeganConnection
+local inputEndedConnection
+
+local function createFOVCircle()
+    if fovCircle then
+        fovCircle:Remove()
+    end
+
+    fovCircle = Drawing.new("Circle")
+    fovCircle.Color = Color3.new(1, 1, 1)
+    fovCircle.Thickness = 1
+    fovCircle.Radius = FOV_RADIUS
+    fovCircle.Filled = false
+    fovCircle.Visible = true
+end
+
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local shortestDistance = FOV_RADIUS
+    local mouseLocation = UserInputService:GetMouseLocation()
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+            local headPosition = Camera:WorldToViewportPoint(player.Character.Head.Position)
+            local screenPosition = Vector2.new(headPosition.X, headPosition.Y)
+            local distance = (screenPosition - mouseLocation).Magnitude
+            
+            if distance < shortestDistance then
+                closestPlayer = player
+                shortestDistance = distance
+            end
+        end
+    end
+    
+    return closestPlayer
+end
+
+local function enableAimbot()
+    createFOVCircle()
+
+    renderSteppedConnection = RunService.RenderStepped:Connect(function()
+        if fovCircle then
+            fovCircle.Position = UserInputService:GetMouseLocation()
+        end
+
+        if AIMBOT_ENABLED then
+            local target = getClosestPlayer()
+            if target and target.Character and target.Character:FindFirstChild("Head") then
+                local headPosition = Camera:WorldToViewportPoint(target.Character.Head.Position)
+                mousemoverel((headPosition.X - UserInputService:GetMouseLocation().X) / 2, (headPosition.Y - UserInputService:GetMouseLocation().Y) / 2)
+            end
+        end
+    end)
+
+    inputBeganConnection = UserInputService.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton2 then
+            AIMBOT_ENABLED = true
+        end
+    end)
+
+    inputEndedConnection = UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton2 then
+            AIMBOT_ENABLED = false
+        end
+    end)
+end
+
+local function disableAimbot()
+    if renderSteppedConnection then renderSteppedConnection:Disconnect() end
+    if inputBeganConnection then inputBeganConnection:Disconnect() end
+    if inputEndedConnection then inputEndedConnection:Disconnect() end
+
+    if fovCircle then
+        fovCircle:Remove()
+        fovCircle = nil
+    end
+
+    AIMBOT_ENABLED = false
+end
+
+	
+	
+
+
+
+
+
+
+
+
+
+
+--trigger
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local Camera = game:GetService("Workspace").CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+
+local TRIGGER_ACTIVE = false  -- Czy TriggerBot jest aktywny?
+
+-- Przechowywanie połączeń, aby można było je wyłączyć
+local inputBeganConnection
+local inputEndedConnection
+local triggerLoop
+
+local function isEnemy(target)
+    if target and target.Parent then
+        local character = target.Parent
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        return humanoid and character ~= LocalPlayer.Character
+    end
+    return false
+end
+
+local function triggerShoot()
+    if Mouse.Target and isEnemy(Mouse.Target) then
+        mouse1press()
+        wait(0.05)
+        mouse1release()
+    end
+end
+
+local function enableTriggerBot()
+    if inputBeganConnection or inputEndedConnection or triggerLoop then return end
+
+    inputBeganConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
+        if input.UserInputType == Enum.UserInputType.MouseButton2 then  -- PPM naciśnięty
+            TRIGGER_ACTIVE = true
+            triggerLoop = task.spawn(function()
+                while TRIGGER_ACTIVE do
+                    triggerShoot()
+                    task.wait(0.01)  -- Szybkie strzelanie
+                end
+            end)
+        end
+    end)
+
+    inputEndedConnection = UserInputService.InputEnded:Connect(function(input, gameProcessed)
+        if input.UserInputType == Enum.UserInputType.MouseButton2 then  -- PPM puszczony
+            TRIGGER_ACTIVE = false
+        end
+    end)
+end
+
+local function disableTriggerBot()
+    if inputBeganConnection then inputBeganConnection:Disconnect() inputBeganConnection = nil end
+    if inputEndedConnection then inputEndedConnection:Disconnect() inputEndedConnection = nil end
+    if triggerLoop then task.cancel(triggerLoop) triggerLoop = nil end
+    TRIGGER_ACTIVE = false
+end
+
+-- Funkcja do przełączania TriggerBota
+
+
+	
+	
+	
+	
+	
+	local Window = ReGui:TabsWindow({
+		Title = "MoonLight",
+		Size = UDim2.fromOffset(300, 200),
+		NoResize = true
+		
+		
+		
+	})
+	
+	local Tab1 = Window:CreateTab({Name=`Combat`})
+	Tab1:Label({
+		
+		Text = `aimbot tab`
+
+		})
+	
+	Tab1:Checkbox({
+	Value = false,
+	Label = "AimBot",
+	Callback = function(self, Value: boolean)
+		if Value == true then
+			enableAimbot()
+		end	
+		if Value == false then
+			disableAimbot()
+		end
+end
+})
+
+Tab1:Checkbox({
+	Value = false,
+	Label = "TriggerBot",
+	Callback = function(self, Value: boolean)
+		if Value == true then
+			enableTriggerBot()
+		end	
+		if Value == false then
+			disableTriggerBot()
+		end
+end
+})
+
+
+
+
+
+	local Tab2 = Window:CreateTab({Name=`Visuals`})
+	Tab2:Label({
+		
+		Text = `esp tab`
+
+		})
+
+	Tab2:Checkbox({
+	Value = false,
+	Label = "ESP",
+	Callback = function(self, Value: boolean)
+		if Value == true then
+											local Players = game:GetService("Players")
+
+											local function createBoxAroundCharacter(character)
+												-- Sprawdź, czy postać istnieje
+												if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+												-- Usuń istniejący Highlight, aby uniknąć duplikatów
+												local existingHighlight = character:FindFirstChildOfClass("Highlight")
+												if existingHighlight then
+													existingHighlight:Destroy()
+												end
+
+												-- Tworzenie nowego Highlight
+												local highlight = Instance.new("Highlight")
+												highlight.Adornee = character
+												highlight.Parent = character
+												highlight.FillColor = Color3.fromRGB(213, 52, 235) 
+												highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+											end
+
+											local function onPlayerAdded(player)
+												-- Nasłuchuj, kiedy postać zostanie dodana
+												player.CharacterAdded:Connect(function(character)
+													-- Odczekaj chwilę, aby upewnić się, że postać została załadowana
+													task.wait(0.5)
+													createBoxAroundCharacter(character)
+												end)
+											end
+
+											-- Dodanie highlighta dla już obecnych graczy
+											for _, player in ipairs(Players:GetPlayers()) do
+												if player.Character then
+													createBoxAroundCharacter(player.Character)
+												end
+												onPlayerAdded(player)
+											end
+
+											-- Obsługa nowych graczy
+											Players.PlayerAdded:Connect(onPlayerAdded)
+
+
+		end
+		if Value == false then
+		loadstring(game:HttpGet("https://pastebin.com/raw/EYdMXKW1"))()
+		end
+	
+	end
+})
+
+
+
+local Tab3 = Window:CreateTab({Name=`Other`})
+	Tab3:Label({
+		
+		Text = `other tab`
+
+		})
+
+
+
+
+
+local Tab3 = Window:CreateTab({Name=`Settings`})
+	Tab3:Label({
+		
+		Text = `.gg/E4uF2TeSpe   [9009]`
+
+		})
+	
+	
+end
+			-- Unsuccessful
+		else
+			Key:SetLabel("Wrong key!")
+		end
+	end,
+})
