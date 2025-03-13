@@ -244,7 +244,7 @@ disableFly()
 -- Po śmierci gracza resetujemy latanie
 player.CharacterAdded:Connect(function()
     setupCharacter()
-    enableFly()
+    disableFly()
 end)
 
 
