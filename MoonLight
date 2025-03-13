@@ -32,9 +32,14 @@ Window:Button({
 			do --// Tabs window demo
 	
 	
+		
+	
 
 
-
+type Button = {
+	Text: string?,
+	Callback: ((...any) -> unknown)?
+}
 
 
 
@@ -343,6 +348,33 @@ local Tab3 = Window:CreateTab({Name=`Other`})
 		})
 
 
+	Tab3:Button({
+	Text = "Purple World",
+	Callback = function(self)
+		local Lighting = game:GetService("Lighting")
+
+-- Sprawdzenie, czy istnieje już Sky, jeśli nie, to dodajemy nowy
+local sky = Lighting:FindFirstChildOfClass("Sky")
+if not sky then
+    sky = Instance.new("Sky")
+    sky.Parent = Lighting
+end
+
+-- Ustawienie fioletowego nieba
+sky.SkyboxUp = "rbxassetid://5917331294"   -- Tekstura nieba (możesz zmienić ID)
+sky.SkyboxDn = "rbxassetid://5917331294"
+sky.SkyboxLf = "rbxassetid://5917331294"
+sky.SkyboxRt = "rbxassetid://5917331294"
+sky.SkyboxFt = "rbxassetid://5917331294"
+sky.SkyboxBk = "rbxassetid://5917331294"
+
+-- Możesz też zmienić kolor otoczenia dla lepszego efektu
+Lighting.Ambient = Color3.fromRGB(128, 0, 128)  -- Fioletowe oświetlenie
+Lighting.OutdoorAmbient = Color3.fromRGB(100, 0, 150)  -- Ciemniejszy fiolet na zewnątrz
+	end
+})
+
+
 
 
 
@@ -354,8 +386,7 @@ local Tab3 = Window:CreateTab({Name=`Settings`})
 		})
 	
 	
-end
-			-- Unsuccessful
+end			-- Unsuccessful
 		else
 			Key:SetLabel("Wrong key!")
 		end
