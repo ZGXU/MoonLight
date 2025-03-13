@@ -286,7 +286,7 @@ end
 
 	Tab2:Checkbox({
 	Value = false,
-	Label = "ESP",
+	Label = "Highlights",
 	Callback = function(self, Value: boolean)
 		if Value == true then
 											local Players = game:GetService("Players")
