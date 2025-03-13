@@ -239,7 +239,7 @@ local function disableFly()
 end
 
 -- Automatycznie uruchamia latanie po załadowaniu skryptu
-enableFly()
+disableFly()
 
 -- Po śmierci gracza resetujemy latanie
 player.CharacterAdded:Connect(function()
