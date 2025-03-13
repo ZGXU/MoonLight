@@ -58,6 +58,68 @@ type RadioButton = {
 
 
 
+--kolorowyswiat
+local function enablePurple()
+
+
+local Lighting = game:GetService("Lighting")
+
+-- Sprawdzenie, czy istnieje już Sky, jeśli nie, to dodajemy nowy
+local sky = Lighting:FindFirstChildOfClass("Sky")
+if not sky then
+    sky = Instance.new("Sky")
+    sky.Parent = Lighting
+end
+
+-- Ustawienie fioletowego nieba
+sky.SkyboxUp = "rbxassetid://5917331294"   -- Tekstura nieba (możesz zmienić ID)
+sky.SkyboxDn = "rbxassetid://5917331294"
+sky.SkyboxLf = "rbxassetid://5917331294"
+sky.SkyboxRt = "rbxassetid://5917331294"
+sky.SkyboxFt = "rbxassetid://5917331294"
+sky.SkyboxBk = "rbxassetid://5917331294"
+
+-- Możesz też zmienić kolor otoczenia dla lepszego efektu
+Lighting.Ambient = Color3.fromRGB(128, 0, 128)  -- Fioletowe oświetlenie
+Lighting.OutdoorAmbient = Color3.fromRGB(100, 0, 150)  -- Ciemniejszy fiolet na zewnątrz
+
+end
+
+local function disablePurple()
+
+
+local Lighting = game:GetService("Lighting")
+
+-- Sprawdzenie, czy istnieje już Sky, jeśli nie, to dodajemy nowy
+local sky = Lighting:FindFirstChildOfClass("Sky")
+if not sky then
+    sky = Instance.new("Sky")
+    sky.Parent = Lighting
+end
+
+-- Ustawienie fioletowego nieba
+sky.SkyboxUp = "rbxassetid://5917331294"   -- Tekstura nieba (możesz zmienić ID)
+sky.SkyboxDn = "rbxassetid://5917331294"
+sky.SkyboxLf = "rbxassetid://5917331294"
+sky.SkyboxRt = "rbxassetid://5917331294"
+sky.SkyboxFt = "rbxassetid://5917331294"
+sky.SkyboxBk = "rbxassetid://5917331294"
+
+-- Możesz też zmienić kolor otoczenia dla lepszego efektu
+Lighting.Ambient = Color3.fromRGB(128, 128, 128)  -- Fioletowe oświetlenie
+Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)  -- Ciemniejszy fiolet na zewnątrz
+
+end
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -497,31 +559,7 @@ local Tab3 = Window:CreateTab({Name=`Other`})
 		})
 
 
-	Tab3:Button({
-	Text = "Purple World",
-	Callback = function(self)
-		local Lighting = game:GetService("Lighting")
 
--- Sprawdzenie, czy istnieje już Sky, jeśli nie, to dodajemy nowy
-local sky = Lighting:FindFirstChildOfClass("Sky")
-if not sky then
-    sky = Instance.new("Sky")
-    sky.Parent = Lighting
-end
-
--- Ustawienie fioletowego nieba
-sky.SkyboxUp = "rbxassetid://5917331294"   -- Tekstura nieba (możesz zmienić ID)
-sky.SkyboxDn = "rbxassetid://5917331294"
-sky.SkyboxLf = "rbxassetid://5917331294"
-sky.SkyboxRt = "rbxassetid://5917331294"
-sky.SkyboxFt = "rbxassetid://5917331294"
-sky.SkyboxBk = "rbxassetid://5917331294"
-
--- Możesz też zmienić kolor otoczenia dla lepszego efektu
-Lighting.Ambient = Color3.fromRGB(128, 0, 128)  -- Fioletowe oświetlenie
-Lighting.OutdoorAmbient = Color3.fromRGB(100, 0, 150)  -- Ciemniejszy fiolet na zewnątrz
-	end
-})
 
 Tab3:Checkbox({
 	Value = false,
@@ -538,9 +576,24 @@ end
 
 
 
+Tab3:Checkbox({
+	Value = false,
+	Label = "Purple World",
+	Callback = function(self, Value: boolean)
+		if Value == true then
+			enablePurple()
+		end	
+		if Value == false then
+			disablePurple()
+		end
+end
+})
 
-local Tab3 = Window:CreateTab({Name=`Settings`})
-	Tab3:Label({
+
+
+
+local Tab4 = Window:CreateTab({Name=`Settings`})
+	Tab4:Label({
 		
 		Text = `.gg/E4uF2TeSpe   [9009]`
 
