@@ -245,6 +245,7 @@ disableFly()
 player.CharacterAdded:Connect(function()
     setupCharacter()
     disableFly()
+toggleNoclip(false)
 end)
 
 
