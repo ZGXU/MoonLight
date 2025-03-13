@@ -1,3 +1,4 @@
+if game.PlaceId == 17625359962 then
 local ReGui = loadstring(game:HttpGet('https://raw.githubusercontent.com/depthso/Dear-ReGui/refs/heads/main/ReGui.lua'))()
 local PrefabsId = `rbxassetid://{ReGui.PrefabsId}`
 
@@ -607,3 +608,8 @@ end			-- Unsuccessful
 		end
 	end,
 })
+
+
+
+
+end --niezmieniac
