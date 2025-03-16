@@ -134,120 +134,120 @@ end
 
 
 --noclip
-local userInputService = game:GetService("UserInputService")
-local runService = game:GetService("RunService")
-local players = game:GetService("Players")
-local player = players.LocalPlayer
+--local userInputService = game:GetService("UserInputService")
+--local runService = game:GetService("RunService")
+--local players = game:GetService("Players")
+--local player = players.LocalPlayer
 
-local baseFlySpeed = 50
-local turboMultiplier = 5
-local flying = false
-local bodyVelocity
-local noclipConnection
-local renderConnection
-local character, humanoid, humanoidRootPart
+--local baseFlySpeed = 50
+--local turboMultiplier = 5
+--local flying = false
+--local bodyVelocity
+--local noclipConnection
+--local renderConnection
+--local character, humanoid, humanoidRootPart
 
 -- Pobieranie postaci po respawnie
-local function setupCharacter()
-    character = player.Character or player.CharacterAdded:Wait()
-    humanoid = character:WaitForChild("Humanoid")
-    humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-end
+--local function setupCharacter()
+    --character = player.Character or player.CharacterAdded:Wait()
+    --humanoid = character:WaitForChild("Humanoid")
+    --humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+--end
 
-setupCharacter()
+--setupCharacter()
 
 -- Funkcja do włączania/wyłączania kolizji
-local function toggleNoclip(state)
-    for _, part in pairs(character:GetDescendants()) do
-        if part:IsA("BasePart") then
-            part.CanCollide = not state
-        end
-    end
-end
+--local function toggleNoclip(state)
+    --for _, part in pairs(character:GetDescendants()) do
+        --if part:IsA("BasePart") then
+            --part.CanCollide = not state
+        --end
+    --end
+--end
 
 -- Rozpoczęcie latania
-local function enableFly()
-    if flying then return end
-    flying = true
+--local function enableFly()
+    --if flying then return end
+    --flying = true
 
-    humanoid.PlatformStand = true
-    toggleNoclip(true)
+    --humanoid.PlatformStand = true
+    --toggleNoclip(true)
 
-    bodyVelocity = Instance.new("BodyVelocity")
-    bodyVelocity.Velocity = Vector3.zero
-    bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-    bodyVelocity.Parent = humanoidRootPart
+    --bodyVelocity = Instance.new("BodyVelocity")
+    --bodyVelocity.Velocity = Vector3.zero
+    --bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    --bodyVelocity.Parent = humanoidRootPart
 
-    noclipConnection = runService.Stepped:Connect(function()
-        toggleNoclip(true)
-    end)
+    --noclipConnection = runService.Stepped:Connect(function()
+        --toggleNoclip(true)
+    --end)
 
-    renderConnection = runService.RenderStepped:Connect(function()
-        if not flying then return end
-        local moveDirection = Vector3.zero
+    --renderConnection = runService.RenderStepped:Connect(function()
+        --if not flying then return end
+        --local moveDirection = Vector3.zero
 
-        if userInputService:IsKeyDown(Enum.KeyCode.W) then
-            moveDirection += humanoidRootPart.CFrame.LookVector
-        end
-        if userInputService:IsKeyDown(Enum.KeyCode.S) then
-            moveDirection -= humanoidRootPart.CFrame.LookVector
-        end
-        if userInputService:IsKeyDown(Enum.KeyCode.A) then
-            moveDirection -= humanoidRootPart.CFrame.RightVector
-        end
-        if userInputService:IsKeyDown(Enum.KeyCode.D) then
-            moveDirection += humanoidRootPart.CFrame.RightVector
-        end
-        if userInputService:IsKeyDown(Enum.KeyCode.Space) then
-            moveDirection += Vector3.new(0, 1, 0)
-        end
-        if userInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
-            moveDirection -= Vector3.new(0, 1, 0)
-        end
+       -- if userInputService:IsKeyDown(Enum.KeyCode.W) then
+         --   moveDirection += humanoidRootPart.CFrame.LookVector
+      --  end
+      --  if userInputService:IsKeyDown(Enum.KeyCode.S) then
+       --     moveDirection -= humanoidRootPart.CFrame.LookVector
+       -- end
+       -- if userInputService:IsKeyDown(Enum.KeyCode.A) then
+         --   moveDirection -= humanoidRootPart.CFrame.RightVector
+      --  end
+      --  if userInputService:IsKeyDown(Enum.KeyCode.D) then
+        --    moveDirection += humanoidRootPart.CFrame.RightVector
+      --  end
+      --  if userInputService:IsKeyDown(Enum.KeyCode.Space) then
+        --    moveDirection += Vector3.new(0, 1, 0)
+      --  end
+      --  if userInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+        --    moveDirection -= Vector3.new(0, 1, 0)
+      --  end
 
-        local flySpeed = baseFlySpeed
-        if userInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
-            flySpeed *= turboMultiplier
-        end
+       -- local flySpeed = baseFlySpeed
+       -- if userInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
+         --   flySpeed *= turboMultiplier
+       -- end
 
-        if moveDirection.Magnitude > 0 then
-            bodyVelocity.Velocity = moveDirection.Unit * flySpeed
-        else
-            bodyVelocity.Velocity = Vector3.zero
-        end
-    end)
-end
+        --if moveDirection.Magnitude > 0 then
+        --    bodyVelocity.Velocity = moveDirection.Unit * flySpeed
+       -- else
+          --  bodyVelocity.Velocity = Vector3.zero
+       -- end
+   -- end)
+--end
 
 -- Zatrzymanie latania
-local function disableFly()
-    if not flying then return end
-    flying = false
-    humanoid.PlatformStand = false
-    toggleNoclip(false)
+--local function disableFly()
+--    if not flying then return end
+ --   flying = false
+--    humanoid.PlatformStand = false
+ --   toggleNoclip(false)
 
-    if bodyVelocity then
-        bodyVelocity:Destroy()
-        bodyVelocity = nil
-    end
-    if noclipConnection then
-        noclipConnection:Disconnect()
-        noclipConnection = nil
-    end
-    if renderConnection then
-        renderConnection:Disconnect()
-        renderConnection = nil
-    end
-end
+--    if bodyVelocity then
+--        bodyVelocity:Destroy()
+ --       bodyVelocity = nil
+--    end
+--    if noclipConnection then
+--        noclipConnection:Disconnect()
+  --      noclipConnection = nil
+--    end
+--    if renderConnection then
+  --      renderConnection:Disconnect()
+  --      renderConnection = nil
+   -- end
+--end
 
 -- Automatycznie uruchamia latanie po załadowaniu skryptu
-enableFly()
+--enableFly()
 
 -- Po śmierci gracza resetujemy latanie
-player.CharacterAdded:Connect(function()
-    setupCharacter()
-    disableFly()
-toggleNoclip(false)
-end)
+--player.CharacterAdded:Connect(function()
+ --   setupCharacter()
+  --  disableFly()
+--toggleNoclip(false)
+--end)
 
 
 
@@ -562,16 +562,77 @@ local Tab3 = Window:CreateTab({Name=`Other`})
 
 
 
+Tab2:Button({
+	Text = "Print",
+	Callback = function(self)
+										local Players = game:GetService("Players")
+								local RunService = game:GetService("RunService")
+								local Camera = workspace.CurrentCamera
+								local LocalPlayer = Players.LocalPlayer
+								
+								local function createESPBox(player)
+								    if player == LocalPlayer then return end -- Nie rysuj ESP dla siebie
+								
+								    local box = Drawing.new("Square")
+								    box.Thickness = 2
+								    box.Color = Color3.fromRGB(0, 0, 0) -- Bialy kolor
+								    box.Filled = false
+								    box.Visible = false
+								
+								    local function update()
+								        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+								            local rootPart = player.Character.HumanoidRootPart
+								            local head = player.Character:FindFirstChild("Head")
+								
+								            if head then
+								                local headPos, headOnScreen = Camera:WorldToViewportPoint(head.Position)
+								                local rootPos, rootOnScreen = Camera:WorldToViewportPoint(rootPart.Position)
+								
+								                if headOnScreen and rootOnScreen then
+								                    -- Obliczanie wysokości i szerokości boxu na podstawie pozycji głowy i ciała
+								                    local height = math.abs(headPos.Y - rootPos.Y)
+								                    local width = height * 0.6 -- Dopasowanie proporcji do gracza
+								
+								                    -- Boxy mają stały rozmiar, ale teraz są 2x wyższe
+								                    box.Size = Vector2.new(width * 3, height * 4) -- Zwiększenie wysokości do 4x
+								                    box.Position = Vector2.new(rootPos.X - box.Size.X / 2, rootPos.Y - box.Size.Y / 2)
+								                    box.Visible = true
+								                else
+								                    box.Visible = false
+								                end
+								            end
+								        else
+								            box.Visible = false
+								        end
+								    end
+								
+								    RunService.RenderStepped:Connect(update)
+								end
+								
+								for _, player in pairs(Players:GetPlayers()) do
+								    if player ~= LocalPlayer then
+								        createESPBox(player)
+								    end
+								end
+								
+								Players.PlayerAdded:Connect(function(player)
+								    createESPBox(player)
+								end)
+
+	end
+})
+
+
 
 Tab3:Checkbox({
 	Value = false,
 	Label = "NoClip",
 	Callback = function(self, Value: boolean)
 		if Value == true then
-			enableFly()
+			--enableFly()
 		end	
 		if Value == false then
-			disableFly()
+			--disableFly()
 		end
 end
 })
