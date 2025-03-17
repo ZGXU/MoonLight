@@ -59,6 +59,419 @@ type RadioButton = {
 
 
 
+
+
+
+
+
+
+
+
+--Name ESP
+local Players = game:GetService("Players")
+
+local nameTags = {}
+local nameEnabled = true
+
+local function createESP(player)
+    if player == Players.LocalPlayer then return end -- Pomija lokalnego gracza
+
+    local function onCharacterAdded(character)
+        local head = character:FindFirstChild("Head")
+        if not head then return end
+
+        -- Tworzenie BillboardGui dla nazwy
+        local billboard = Instance.new("BillboardGui")
+        billboard.Adornee = head
+        billboard.Size = UDim2.new(0, 100, 0, 30) -- Przywrócony oryginalny rozmiar
+        billboard.StudsOffset = Vector3.new(0, 2, 0) -- Pozycja nad głową
+        billboard.AlwaysOnTop = true
+        billboard.Enabled = nameEnabled
+
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Parent = billboard
+        textLabel.Size = UDim2.new(1, 0, 1, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.Text = player.Name
+        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- Biały tekst
+        textLabel.TextStrokeTransparency = 0 -- Widoczna obwódka
+        textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0) -- Czarna obwódka
+        textLabel.TextScaled = true
+        textLabel.Font = Enum.Font.SourceSansBold
+
+        billboard.Parent = character
+        nameTags[player] = billboard
+    end
+
+    -- Jeśli gracz ma już postać, dodajemy ESP
+    if player.Character then
+        onCharacterAdded(player.Character)
+    end
+
+    -- Nasłuchiwanie na odradzanie się gracza
+    player.CharacterAdded:Connect(onCharacterAdded)
+end
+
+-- Włączanie i wyłączanie ESP
+function enableName()
+    nameEnabled = true
+    for _, tag in pairs(nameTags) do
+        if tag then
+            tag.Enabled = true
+        end
+    end
+end
+
+function disableName()
+    nameEnabled = false
+    for _, tag in pairs(nameTags) do
+        if tag then
+            tag.Enabled = false
+        end
+    end
+end
+
+-- Dodajemy ESP dla istniejących graczy
+for _, player in pairs(Players:GetPlayers()) do
+    createESP(player)
+end
+
+-- Dodajemy ESP dla nowych graczy
+Players.PlayerAdded:Connect(function(player)
+    createESP(player)
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--BOX
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+-- Przechowujemy ESP Boxy
+local espBoxes = {}
+
+local function createESPBox(player)
+    if player == LocalPlayer then return end -- Nie rysuj ESP dla siebie
+
+    local box = Drawing.new("Square")
+    local outerBox1 = Drawing.new("Square") -- Zewnętrzna obwódka
+    local outerBox2 = Drawing.new("Square") -- Wewnętrzna obwódka
+
+    local thickness = 2
+    local borderThickness = thickness * 0.5 -- Obwódka 0.5x cieńsza niż główny box
+
+    -- Główne ESP Boxy (Białe)
+    box.Thickness = thickness
+    box.Color = Color3.fromRGB(255, 255, 255) -- Biały kolor
+    box.Filled = false
+    box.Visible = false
+
+    -- Obwódka zewnętrzna (Czarna)
+    outerBox1.Thickness = borderThickness
+    outerBox1.Color = Color3.fromRGB(0, 0, 0) -- Czarna obwódka
+    outerBox1.Filled = false
+    outerBox1.Visible = false
+
+    -- Obwódka wewnętrzna (Czarna)
+    outerBox2.Thickness = borderThickness
+    outerBox2.Color = Color3.fromRGB(0, 0, 0) -- Czarna obwódka
+    outerBox2.Filled = false
+    outerBox2.Visible = false
+
+    local function update()
+        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = player.Character.HumanoidRootPart
+            local head = player.Character:FindFirstChild("Head")
+
+            if head then
+                local headPos, headOnScreen = Camera:WorldToViewportPoint(head.Position)
+                local rootPos, rootOnScreen = Camera:WorldToViewportPoint(rootPart.Position)
+
+                if headOnScreen and rootOnScreen then
+                    -- Obliczanie wysokości i szerokości boxu na podstawie pozycji głowy i ciała
+                    local height = math.abs(headPos.Y - rootPos.Y)
+                    local width = height * 0.6 -- Dopasowanie proporcji do gracza
+
+                    -- Zwiększenie wysokości i szerokości boxów
+                    local boxSize = Vector2.new(width * 3, height * 4)
+                    local boxPos = Vector2.new(rootPos.X - boxSize.X / 2, rootPos.Y - boxSize.Y / 2)
+
+                    box.Size = boxSize
+                    box.Position = boxPos
+
+                    -- Obwódka na zewnątrz (większa)
+                    outerBox1.Size = boxSize + Vector2.new(borderThickness * 2, borderThickness * 2)
+                    outerBox1.Position = boxPos - Vector2.new(borderThickness, borderThickness)
+
+                    -- Obwódka wewnętrzna (mniejsza)
+                    outerBox2.Size = boxSize - Vector2.new(borderThickness * 2, borderThickness * 2)
+                    outerBox2.Position = boxPos + Vector2.new(borderThickness, borderThickness)
+
+                    -- Ustawienie widoczności
+                    box.Visible = true
+                    outerBox1.Visible = true
+                    outerBox2.Visible = true
+                else
+                    box.Visible = false
+                    outerBox1.Visible = false
+                    outerBox2.Visible = false
+                end
+            end
+        else
+            box.Visible = false
+            outerBox1.Visible = false
+            outerBox2.Visible = false
+        end
+    end
+
+    RunService.RenderStepped:Connect(update)
+
+    -- Przechowujemy ESP Boxy w tabeli
+    espBoxes[player.UserId] = {box = box, outerBox1 = outerBox1, outerBox2 = outerBox2}
+end
+
+-- Funkcja włączająca ESP Boxy
+local function enableBox()
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and not espBoxes[player.UserId] then
+            createESPBox(player)
+        end
+    end
+end
+
+-- Funkcja wyłączająca ESP Boxy
+local function disableBox()
+    for _, player in pairs(Players:GetPlayers()) do
+        local boxes = espBoxes[player.UserId]
+        if boxes then
+            boxes.box:Remove()        -- Usuwa główny box
+            boxes.outerBox1:Remove()  -- Usuwa zewnętrzną obwódkę
+            boxes.outerBox2:Remove()  -- Usuwa wewnętrzną obwódkę
+            espBoxes[player.UserId] = nil  -- Usuwamy z tabeli
+        end
+    end
+end
+
+-- Dodanie ESP Boxów dla istniejących graczy
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        createESPBox(player)
+    end
+end
+
+-- Dodanie ESP Boxów dla nowych graczy
+Players.PlayerAdded:Connect(function(player)
+    createESPBox(player)
+end)
+
+-- Przykład użycia:
+-- enableBox()  -- Włącza ESP Boxy dla wszystkich graczy
+-- disableBox() -- Wyłącza ESP Boxy dla wszystkich graczy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--healthbar
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+-- Przechowujemy informacje o Health Barach
+local healthBars = {}
+
+local function createHealthBar(player)
+    if player == Players.LocalPlayer then return end -- Pomija lokalnego gracza
+
+    local function onCharacterAdded(character)
+        local head = character:FindFirstChild("Head")
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if not head or not humanoid then return end
+
+        -- Tworzenie BillboardGui dla Health Bara
+        local billboard = Instance.new("BillboardGui")
+        billboard.Adornee = head
+        billboard.Size = UDim2.new(1, 0, 3, 0)
+        billboard.StudsOffset = Vector3.new(2, -2, 0) -- Pasek zdrowia obok gracza (w prawo)
+        billboard.AlwaysOnTop = true
+
+        -- Tło paska zdrowia (czarne)
+        local background = Instance.new("Frame")
+        background.Size = UDim2.new(0.3, 0, 1, 0)
+        background.Position = UDim2.new(0.5, 0, 0, 0)
+        background.AnchorPoint = Vector2.new(0.5, 0)
+        background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        background.BorderSizePixel = 0
+        background.Parent = billboard
+
+        -- Pasek zdrowia (dynamiczny)
+        local healthBar = Instance.new("Frame")
+        healthBar.Size = UDim2.new(1, 0, 1, 0)
+        healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Zielony pasek
+        healthBar.BorderSizePixel = 0
+        healthBar.Position = UDim2.new(0, 0, 1, 0) -- Startuje na dole
+        healthBar.AnchorPoint = Vector2.new(0, 1)
+        healthBar.Parent = background
+
+        -- Aktualizacja paska zdrowia
+        local function updateHealth()
+            if humanoid and healthBar then
+                local healthPercent = humanoid.Health / humanoid.MaxHealth
+                healthBar.Size = UDim2.new(1, 0, healthPercent, 0)
+
+                -- Zmiana koloru w zależności od HP
+                if healthPercent > 0.6 then
+                    healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Zielony
+                elseif healthPercent > 0.3 then
+                    healthBar.BackgroundColor3 = Color3.fromRGB(255, 165, 0) -- Pomarańczowy
+                else
+                    healthBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Czerwony
+                end
+            end
+        end
+
+        -- Aktualizuje pasek zdrowia co klatkę
+        local connection
+        connection = RunService.RenderStepped:Connect(function()
+            if humanoid.Health <= 0 then
+                connection:Disconnect() -- Przestaje aktualizować po śmierci
+                billboard:Destroy() -- Usuwa pasek zdrowia
+            else
+                updateHealth()
+            end
+        end)
+
+        billboard.Parent = character
+
+        -- Przechowywanie BillboardGui (Health Bar) w tabeli
+        healthBars[player.UserId] = billboard
+    end
+
+    -- Jeśli gracz ma już postać, dodajemy Health Bar
+    if player.Character then
+        onCharacterAdded(player.Character)
+    end
+
+    -- Nasłuchiwanie na odradzanie się gracza
+    player.CharacterAdded:Connect(onCharacterAdded)
+end
+
+-- Dodajemy Health Bar dla istniejących graczy
+for _, player in pairs(Players:GetPlayers()) do
+    createHealthBar(player)
+end
+
+-- Dodajemy Health Bar dla nowych graczy
+Players.PlayerAdded:Connect(function(player)
+    createHealthBar(player)
+end)
+
+-- Funkcja włączająca Health Bar ESP dla gracza
+local function enableHealth()
+    for _, player in pairs(Players:GetPlayers()) do
+        if not healthBars[player.UserId] then
+            createHealthBar(player)
+        end
+    end
+end
+
+-- Funkcja wyłączająca Health Bar ESP dla gracza
+local function disableHealth()
+    for _, player in pairs(Players:GetPlayers()) do
+        local billboard = healthBars[player.UserId]
+        if billboard then
+            billboard:Destroy()  -- Usuwamy Health Bar
+            healthBars[player.UserId] = nil  -- Usuwamy z tabeli
+        end
+    end
+end
+
+-- Przykład wywołania: Możesz włączyć lub wyłączyć Health Bar ESP
+-- enableHealth()  -- Włącza Health Bar dla wszystkich graczy
+-- disableHealth() -- Wyłącza Health Bar dla wszystkich graczy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 --kolorowyswiat
 local function enablePurple()
 
@@ -372,6 +785,22 @@ end
 
 
 
+--update
+function updateFOV()
+    if not fovCircle then
+        createFOVCircle() -- Tworzy nowy okrąg, jeśli nie istnieje
+    end
+    fovCircle.Visible = false  
+    fovCircle.Radius = FOV_RADIUS  
+    fovCircle.Visible = true   
+end
+
+
+
+
+
+
+
 
 
 
@@ -453,6 +882,7 @@ end
 		
 	})
 	
+	
 	local Tab1 = Window:CreateTab({Name=`Combat`})
 	Tab1:Label({
 		
@@ -485,6 +915,18 @@ Tab1:Checkbox({
 		end
 end
 })
+
+Tab1:SliderInt({
+ 	Value = 100,
+	Minimum = 50,
+	Maximum = 300,
+	Callback = function(self, Value)
+	FOV_RADIUS = Value
+	updateFOV()
+
+	end,
+})
+
 
 
 
@@ -553,74 +995,65 @@ end
 
 
 
+
+Tab2:Checkbox({
+	Value = false,
+	Label = "Box ESP",
+	Callback = function(self, Value: boolean)
+		if Value == true then
+			enableBox()
+		end	
+		if Value == false then
+			disableBox()
+		end
+end
+})
+
+
+
+
+
+
+
+Tab2:Checkbox({
+	Value = false,
+	Label = "Health Bar",
+	Callback = function(self, Value: boolean)
+		if Value == true then
+			enableHealth()
+		end	
+		if Value == false then
+			disableHealth()
+		end
+end
+})
+
+
+Tab2:Checkbox({
+	Value = false,
+	Label = "Name Tag",
+	Callback = function(self, Value: boolean)
+		if Value == true then
+			enableName()
+		end	
+		if Value == false then
+			disableName()
+		end
+end
+})
+
+
+
+
+
+
+
 local Tab3 = Window:CreateTab({Name=`Other`})
 	Tab3:Label({
 		
 		Text = `other tab`
 
 		})
-
-
-
-Tab2:Button({
-	Text = "Print",
-	Callback = function(self)
-										local Players = game:GetService("Players")
-								local RunService = game:GetService("RunService")
-								local Camera = workspace.CurrentCamera
-								local LocalPlayer = Players.LocalPlayer
-								
-								local function createESPBox(player)
-								    if player == LocalPlayer then return end -- Nie rysuj ESP dla siebie
-								
-								    local box = Drawing.new("Square")
-								    box.Thickness = 2
-								    box.Color = Color3.fromRGB(0, 0, 0) -- Bialy kolor
-								    box.Filled = false
-								    box.Visible = false
-								
-								    local function update()
-								        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-								            local rootPart = player.Character.HumanoidRootPart
-								            local head = player.Character:FindFirstChild("Head")
-								
-								            if head then
-								                local headPos, headOnScreen = Camera:WorldToViewportPoint(head.Position)
-								                local rootPos, rootOnScreen = Camera:WorldToViewportPoint(rootPart.Position)
-								
-								                if headOnScreen and rootOnScreen then
-								                    -- Obliczanie wysokości i szerokości boxu na podstawie pozycji głowy i ciała
-								                    local height = math.abs(headPos.Y - rootPos.Y)
-								                    local width = height * 0.6 -- Dopasowanie proporcji do gracza
-								
-								                    -- Boxy mają stały rozmiar, ale teraz są 2x wyższe
-								                    box.Size = Vector2.new(width * 3, height * 4) -- Zwiększenie wysokości do 4x
-								                    box.Position = Vector2.new(rootPos.X - box.Size.X / 2, rootPos.Y - box.Size.Y / 2)
-								                    box.Visible = true
-								                else
-								                    box.Visible = false
-								                end
-								            end
-								        else
-								            box.Visible = false
-								        end
-								    end
-								
-								    RunService.RenderStepped:Connect(update)
-								end
-								
-								for _, player in pairs(Players:GetPlayers()) do
-								    if player ~= LocalPlayer then
-								        createESPBox(player)
-								    end
-								end
-								
-								Players.PlayerAdded:Connect(function(player)
-								    createESPBox(player)
-								end)
-
-	end
-})
 
 
 
@@ -661,6 +1094,18 @@ local Tab4 = Window:CreateTab({Name=`Settings`})
 		Text = `.gg/E4uF2TeSpe   [9009]`
 
 		})
+
+
+
+
+Tab4:Keybind({
+    Label = "Gui Key",
+    Value = Enum.KeyCode.Insert,
+    Callback = function(_, NewKeybind)
+        local IsVisible = Window.Visible
+        Window:SetVisible(not IsVisible)
+    end
+})
 	
 	
 end			-- Unsuccessful
@@ -672,5 +1117,4 @@ end			-- Unsuccessful
 
 
 
-
-end --niezmieniac
+end--nie zmieniac 
