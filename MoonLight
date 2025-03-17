@@ -9,14 +9,45 @@ ReGui:Init({
 
 
 
+ReGui:DefineTheme("Cherry", {
+	TitleAlign = Enum.TextXAlignment.Center,
+	TextDisabled = Color3.fromRGB(120, 100, 120),
+	Text = Color3.fromRGB(200, 180, 200),
+	
+	FrameBg = Color3.fromRGB(25, 20, 25),
+	FrameBgTransparency = 0.4,
+	FrameBgActive = Color3.fromRGB(120, 100, 120),
+	FrameBgTransparencyActive = 0.4,
+	
+	CheckMark = Color3.fromRGB(150, 100, 150),
+	SliderGrab = Color3.fromRGB(150, 100, 150),
+	ButtonsBg = Color3.fromRGB(150, 100, 150),
+	CollapsingHeaderBg = Color3.fromRGB(150, 100, 150),
+	CollapsingHeaderText = Color3.fromRGB(200, 180, 200),
+	RadioButtonHoveredBg = Color3.fromRGB(150, 100, 150),
+	
+	WindowBg = Color3.fromRGB(35, 30, 35),
+	TitleBarBg = Color3.fromRGB(35, 30, 35),
+	TitleBarBgActive = Color3.fromRGB(50, 45, 50),
+	
+	Border = Color3.fromRGB(50, 45, 50),
+	ResizeGrab = Color3.fromRGB(50, 45, 50),
+	RegionBgTransparency = 1,
+	Tab = Color3.fromRGB(50, 45, 50),
+})
+
+
+
+
 
 local Window = ReGui:Window({
 	Title = "Key system",
 	Size = UDim2.fromOffset(300, 100),
 	NoCollapse = true,
 	NoResize = true,
+	Theme = "Cherry",
 	NoClose = true
-})
+}):Center()
 
 local Key = Window:InputText({
 	Label = "Key",
@@ -868,19 +899,44 @@ end
 -- Funkcja do przełączania TriggerBota
 
 
+
+
+
+
+
+
+
+
+local ModalWindow = Window:PopupModal({
+	Title = "MoonLight Info",
+	AutoSize = "Y"
+})
 	
-	
+	ModalWindow:Label({
+	Text = [[Last Update 17.03.2025]],
+	TextWrapped = true
+})
+ModalWindow:Separator()
+
+ModalWindow:Button({
+	Text = "Okay",
+	Callback = function()
+		ModalWindow:ClosePopup()
+	end,
+})
 	
 	
 	
 	local Window = ReGui:TabsWindow({
 		Title = "MoonLight",
-		Size = UDim2.fromOffset(300, 200),
-		NoResize = true
+		Size = UDim2.fromOffset(600, 400),
+		Theme = "Cherry",
+		NoResize = true,
+		NoCollapse = true,
+		NoClose = true
 		
 		
-		
-	})
+	}):Center()
 	
 	
 	local Tab1 = Window:CreateTab({Name=`Combat`})
@@ -917,9 +973,10 @@ end
 })
 
 Tab1:SliderInt({
+	Label = "FOV Size",
  	Value = 100,
 	Minimum = 50,
-	Maximum = 300,
+	Maximum = 500,
 	Callback = function(self, Value)
 	FOV_RADIUS = Value
 	updateFOV()
@@ -1106,6 +1163,8 @@ Tab4:Keybind({
         Window:SetVisible(not IsVisible)
     end
 })
+local Settings = CreateTab("Setttings", ReGui.Icons.Settings)
+
 	
 	
 end			-- Unsuccessful
