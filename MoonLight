@@ -6,9 +6,6 @@ local PrefabsId = `rbxassetid://{ReGui.PrefabsId}`
 ReGui:Init({
 	Prefabs = game:GetService("InsertService"):LoadLocalAsset(PrefabsId)
 })
-
-
-
 ReGui:DefineTheme("Cherry", {
 	TitleAlign = Enum.TextXAlignment.Center,
 	TextDisabled = Color3.fromRGB(120, 100, 120),
@@ -33,14 +30,16 @@ ReGui:DefineTheme("Cherry", {
 	Border = Color3.fromRGB(50, 45, 50),
 	ResizeGrab = Color3.fromRGB(50, 45, 50),
 	RegionBgTransparency = 1,
-	Tab = Color3.fromRGB(50, 45, 50),
 })
 
 
 
 
 
-local Window = ReGui:Window({
+
+
+
+local Window1 = ReGui:Window({
 	Title = "Key system",
 	Size = UDim2.fromOffset(300, 100),
 	NoCollapse = true,
@@ -49,50 +48,19 @@ local Window = ReGui:Window({
 	NoClose = true
 }):Center()
 
-local Key = Window:InputText({
+local Key = Window1:InputText({
 	Label = "Key",
 	PlaceHolder = "Key here",
 	Value = "",
 })
 
-Window:Button({
+Window1:Button({
 	Text = "Enter",
 	Callback = function()
 		-- Successful
 		if Key:GetValue() == "MoonLightTop" then
-		Window:Close()
-			do --// Tabs window demo
-	
-	
-		
-	
-
-
-type Button = {
-	Text: string?,
-	Callback: ((...any) -> unknown)?
-}
-
-
-
-type RadioButton = {
-	Label: string?,
-	IsRadio: boolean?,
-	Value: boolean,
-	NoAnimation: boolean?,
-	Callback: ((...any) -> unknown)?,
-	SetTicked: (self: Checkbox, Value: boolean, NoAnimation: boolean) -> ...any,
-	Toggle: (self: Checkbox) -> ...any
-}
-	
-
-
-
-
-
-
-
-
+		Window1:Close()
+		do
 
 
 
@@ -517,12 +485,12 @@ if not sky then
 end
 
 -- Ustawienie fioletowego nieba
-sky.SkyboxUp = "rbxassetid://5917331294"   -- Tekstura nieba (możesz zmienić ID)
-sky.SkyboxDn = "rbxassetid://5917331294"
-sky.SkyboxLf = "rbxassetid://5917331294"
-sky.SkyboxRt = "rbxassetid://5917331294"
-sky.SkyboxFt = "rbxassetid://5917331294"
-sky.SkyboxBk = "rbxassetid://5917331294"
+sky.SkyboxUp = "rbxassetid://653735694"   -- Tekstura nieba (możesz zmienić ID)
+sky.SkyboxDn = "rbxassetid://653735694"
+sky.SkyboxLf = "rbxassetid://653735694"
+sky.SkyboxRt = "rbxassetid://653735694"
+sky.SkyboxFt = "rbxassetid://653735694"
+sky.SkyboxBk = "rbxassetid://653735694"
 
 -- Możesz też zmienić kolor otoczenia dla lepszego efektu
 Lighting.Ambient = Color3.fromRGB(128, 0, 128)  -- Fioletowe oświetlenie
@@ -543,12 +511,12 @@ if not sky then
 end
 
 -- Ustawienie fioletowego nieba
-sky.SkyboxUp = "rbxassetid://5917331294"   -- Tekstura nieba (możesz zmienić ID)
-sky.SkyboxDn = "rbxassetid://5917331294"
-sky.SkyboxLf = "rbxassetid://5917331294"
-sky.SkyboxRt = "rbxassetid://5917331294"
-sky.SkyboxFt = "rbxassetid://5917331294"
-sky.SkyboxBk = "rbxassetid://5917331294"
+sky.SkyboxUp = "rbxassetid://6412503613"   -- Tekstura nieba (możesz zmienić ID)
+sky.SkyboxDn = "rbxassetid://6444884785"
+sky.SkyboxLf = "rbxassetid://6444884337"
+sky.SkyboxRt = "rbxassetid://6444884337"
+sky.SkyboxFt = "rbxassetid://6444884337"
+sky.SkyboxBk = "rbxassetid://6444884337"
 
 -- Możesz też zmienić kolor otoczenia dla lepszego efektu
 Lighting.Ambient = Color3.fromRGB(128, 128, 128)  -- Fioletowe oświetlenie
@@ -578,120 +546,112 @@ end
 
 
 --noclip
---local userInputService = game:GetService("UserInputService")
---local runService = game:GetService("RunService")
---local players = game:GetService("Players")
---local player = players.LocalPlayer
+local userInputService = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
+local players = game:GetService("Players")
+local player = players.LocalPlayer
 
---local baseFlySpeed = 50
---local turboMultiplier = 5
---local flying = false
---local bodyVelocity
---local noclipConnection
---local renderConnection
---local character, humanoid, humanoidRootPart
+local baseFlySpeed = 50
+local turboMultiplier = 5
+local flying = false
+local bodyVelocity
+local noclipConnection
+local character, humanoid, humanoidRootPart
 
--- Pobieranie postaci po respawnie
---local function setupCharacter()
-    --character = player.Character or player.CharacterAdded:Wait()
-    --humanoid = character:WaitForChild("Humanoid")
-    --humanoidRootPart = character:WaitForChild("HumanoidRootPart")
---end
+-- Funkcja do pobrania nowej postaci po respawnie
+local function setupCharacter()
+    character = player.Character or player.CharacterAdded:Wait()
+    humanoid = character:WaitForChild("Humanoid")
+    humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+end
 
---setupCharacter()
+setupCharacter() -- Inicjalizacja przy starcie gry
 
--- Funkcja do włączania/wyłączania kolizji
---local function toggleNoclip(state)
-    --for _, part in pairs(character:GetDescendants()) do
-        --if part:IsA("BasePart") then
-            --part.CanCollide = not state
-        --end
-    --end
---end
+-- Wyłączanie kolizji
+local function toggleNoclip(state)
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = not state
+        end
+    end
+end
 
 -- Rozpoczęcie latania
---local function enableFly()
-    --if flying then return end
-    --flying = true
+local function startFlying()
+    if flying then return end
+    flying = true
 
-    --humanoid.PlatformStand = true
-    --toggleNoclip(true)
+    humanoid.PlatformStand = true
+    toggleNoclip(true)
 
-    --bodyVelocity = Instance.new("BodyVelocity")
-    --bodyVelocity.Velocity = Vector3.zero
-    --bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-    --bodyVelocity.Parent = humanoidRootPart
+    bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+    bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    bodyVelocity.Parent = humanoidRootPart
 
-    --noclipConnection = runService.Stepped:Connect(function()
-        --toggleNoclip(true)
-    --end)
+    noclipConnection = runService.Stepped:Connect(function()
+        toggleNoclip(true)
+    end)
 
-    --renderConnection = runService.RenderStepped:Connect(function()
-        --if not flying then return end
-        --local moveDirection = Vector3.zero
+    runService.RenderStepped:Connect(function()
+        if flying then
+            local moveDirection = Vector3.new(0, 0, 0)
 
-       -- if userInputService:IsKeyDown(Enum.KeyCode.W) then
-         --   moveDirection += humanoidRootPart.CFrame.LookVector
-      --  end
-      --  if userInputService:IsKeyDown(Enum.KeyCode.S) then
-       --     moveDirection -= humanoidRootPart.CFrame.LookVector
-       -- end
-       -- if userInputService:IsKeyDown(Enum.KeyCode.A) then
-         --   moveDirection -= humanoidRootPart.CFrame.RightVector
-      --  end
-      --  if userInputService:IsKeyDown(Enum.KeyCode.D) then
-        --    moveDirection += humanoidRootPart.CFrame.RightVector
-      --  end
-      --  if userInputService:IsKeyDown(Enum.KeyCode.Space) then
-        --    moveDirection += Vector3.new(0, 1, 0)
-      --  end
-      --  if userInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
-        --    moveDirection -= Vector3.new(0, 1, 0)
-      --  end
+            if userInputService:IsKeyDown(Enum.KeyCode.W) then
+                moveDirection = moveDirection + humanoidRootPart.CFrame.LookVector
+            end
+            if userInputService:IsKeyDown(Enum.KeyCode.S) then
+                moveDirection = moveDirection - humanoidRootPart.CFrame.LookVector
+            end
+            if userInputService:IsKeyDown(Enum.KeyCode.A) then
+                moveDirection = moveDirection - humanoidRootPart.CFrame.RightVector
+            end
+            if userInputService:IsKeyDown(Enum.KeyCode.D) then
+                moveDirection = moveDirection + humanoidRootPart.CFrame.RightVector
+            end
+            if userInputService:IsKeyDown(Enum.KeyCode.Space) then
+                moveDirection = moveDirection + Vector3.new(0, 1, 0)
+            end
+            if userInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                moveDirection = moveDirection - Vector3.new(0, 1, 0)
+            end
 
-       -- local flySpeed = baseFlySpeed
-       -- if userInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
-         --   flySpeed *= turboMultiplier
-       -- end
+            local flySpeed = baseFlySpeed
+            if userInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
+                flySpeed = baseFlySpeed * turboMultiplier
+            end
 
-        --if moveDirection.Magnitude > 0 then
-        --    bodyVelocity.Velocity = moveDirection.Unit * flySpeed
-       -- else
-          --  bodyVelocity.Velocity = Vector3.zero
-       -- end
-   -- end)
---end
+            if moveDirection.Magnitude > 0 then
+                bodyVelocity.Velocity = moveDirection.Unit * flySpeed
+            else
+                bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+            end
+        else
+            bodyVelocity:Destroy()
+        end
+    end)
+end
 
 -- Zatrzymanie latania
---local function disableFly()
---    if not flying then return end
- --   flying = false
---    humanoid.PlatformStand = false
- --   toggleNoclip(false)
+local function stopFlying()
+    flying = false
+    humanoid.PlatformStand = false
+    toggleNoclip(false)
+    if bodyVelocity then
+        bodyVelocity:Destroy()
+    end
+    if noclipConnection then
+        noclipConnection:Disconnect()
+    end
+end
 
---    if bodyVelocity then
---        bodyVelocity:Destroy()
- --       bodyVelocity = nil
---    end
---    if noclipConnection then
---        noclipConnection:Disconnect()
-  --      noclipConnection = nil
---    end
---    if renderConnection then
-  --      renderConnection:Disconnect()
-  --      renderConnection = nil
-   -- end
---end
 
--- Automatycznie uruchamia latanie po załadowaniu skryptu
---enableFly()
 
--- Po śmierci gracza resetujemy latanie
---player.CharacterAdded:Connect(function()
- --   setupCharacter()
-  --  disableFly()
---toggleNoclip(false)
---end)
+-- Po śmierci gracza skrypt resetuje się i ponownie inicjalizuje
+player.CharacterAdded:Connect(function()
+    setupCharacter()
+    stopFlying() -- Resetujemy stan latania po respawnie
+end)
 
 
 
@@ -896,7 +856,6 @@ local function disableTriggerBot()
     TRIGGER_ACTIVE = false
 end
 
--- Funkcja do przełączania TriggerBota
 
 
 
@@ -906,14 +865,55 @@ end
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--// Tabs
+local Window = ReGui:Window({
+	Title = "MoonLight",
+	Theme = "Cherry",
+	NoClose = true,
+	Size = UDim2.new(0, 600, 0, 400),
+}):Center()
 
 local ModalWindow = Window:PopupModal({
 	Title = "MoonLight Info",
 	AutoSize = "Y"
 })
-	
-	ModalWindow:Label({
-	Text = [[Last Update 17.03.2025]],
+
+ModalWindow:Label({
+	Text = [[Last Update : 18.03.2025]],
 	TextWrapped = true
 })
 ModalWindow:Separator()
@@ -924,29 +924,87 @@ ModalWindow:Button({
 		ModalWindow:ClosePopup()
 	end,
 })
-	
-	
-	
-	local Window = ReGui:TabsWindow({
-		Title = "MoonLight",
-		Size = UDim2.fromOffset(600, 400),
-		Theme = "Cherry",
-		NoResize = true,
-		NoCollapse = true,
-		NoClose = true
-		
-		
-	}):Center()
-	
-	
-	local Tab1 = Window:CreateTab({Name=`Combat`})
-	Tab1:Label({
-		
-		Text = `aimbot tab`
 
+local Group = Window:List({
+	UiPadding = 2,
+	HorizontalFlex = Enum.UIFlexAlignment.Fill,
+})
+
+local TabsBar = Group:List({
+	Border = true,
+	UiPadding = 5,
+	BorderColor = Window:GetThemeKey("Border"),
+	BorderThickness = 1,
+	HorizontalFlex = Enum.UIFlexAlignment.Fill,
+	HorizontalAlignment = Enum.HorizontalAlignment.Center,
+	AutomaticSize = Enum.AutomaticSize.None,
+	FlexMode = Enum.UIFlexMode.None,
+	Size = UDim2.new(0, 40, 1, 0),
+	CornerRadius = UDim.new(0, 5)
+})
+local TabSelector = Group:TabSelector({
+	NoTabsBar = true,
+	Size = UDim2.fromScale(0.5, 1)
+})
+
+local function CreateTab(Name: string, Icon)
+	local Tab = TabSelector:CreateTab({
+		Name = Name
+	})
+
+	local List = Tab:List({
+		HorizontalFlex = Enum.UIFlexAlignment.Fill,
+		UiPadding = 1,
+		Spacing = 10
+	})
+
+	local Button = TabsBar:Image({
+		Image = Icon,
+		Ratio = 1,
+		RatioAxis = Enum.DominantAxis.Width,
+		Size = UDim2.fromScale(1, 1),
+		Callback = function(self)
+			TabSelector:SetActiveTab(Tab)
+		end,
+	})
+
+	ReGui:SetItemTooltip(Button, function(Canvas)
+		Canvas:Label({
+			Text = Name
 		})
-	
-	Tab1:Checkbox({
+	end)
+
+	return List
+end
+
+local function CreateRegion(Parent, Title)
+	local Region = Parent:Region({
+		Border = true,
+		BorderColor = Window:GetThemeKey("Border"),
+		BorderThickness = 1,
+		CornerRadius = UDim.new(0, 5)
+	})
+
+	Region:Label({
+		Text = Title
+	})
+
+	return Region
+end
+
+local Combat = CreateTab("Combat", 139650104834071)
+local Visuals = CreateTab("Visuals", 18854794412)
+local Misc = CreateTab("Misc", 8498174594)
+local Settings = CreateTab("Settings", ReGui.Icons.Settings)
+
+--// Combat Tab
+local AimbotSection = CreateRegion(Combat, "AimBot") 
+local TriggerSection = CreateRegion(Combat, "TriggerBot") 
+
+
+
+
+AimbotSection:Checkbox({
 	Value = false,
 	Label = "AimBot",
 	Callback = function(self, Value: boolean)
@@ -959,20 +1017,9 @@ ModalWindow:Button({
 end
 })
 
-Tab1:Checkbox({
-	Value = false,
-	Label = "TriggerBot",
-	Callback = function(self, Value: boolean)
-		if Value == true then
-			enableTriggerBot()
-		end	
-		if Value == false then
-			disableTriggerBot()
-		end
-end
-})
 
-Tab1:SliderInt({
+
+AimbotSection:SliderInt({
 	Label = "FOV Size",
  	Value = 100,
 	Minimum = 50,
@@ -989,14 +1036,33 @@ Tab1:SliderInt({
 
 
 
-	local Tab2 = Window:CreateTab({Name=`Visuals`})
-	Tab2:Label({
-		
-		Text = `esp tab`
 
-		})
+--trigger
 
-	Tab2:Checkbox({
+TriggerSection:Checkbox({
+	Value = false,
+	Label = "TriggerBot",
+	Callback = function(self, Value: boolean)
+		if Value == true then
+			enableTriggerBot()
+		end	
+		if Value == false then
+			disableTriggerBot()
+		end
+end
+})
+
+
+
+
+
+
+--// Visuals
+local MainSection = CreateRegion(Visuals, "Main") 
+local MoreSection = CreateRegion(Visuals, "More") 
+
+
+MainSection:Checkbox({
 	Value = false,
 	Label = "HighLights",
 	Callback = function(self, Value: boolean)
@@ -1053,7 +1119,7 @@ Tab1:SliderInt({
 
 
 
-Tab2:Checkbox({
+MainSection:Checkbox({
 	Value = false,
 	Label = "Box ESP",
 	Callback = function(self, Value: boolean)
@@ -1072,7 +1138,10 @@ end
 
 
 
-Tab2:Checkbox({
+
+-- More
+
+MoreSection:Checkbox({
 	Value = false,
 	Label = "Health Bar",
 	Callback = function(self, Value: boolean)
@@ -1085,8 +1154,7 @@ Tab2:Checkbox({
 end
 })
 
-
-Tab2:Checkbox({
+MoreSection:Checkbox({
 	Value = false,
 	Label = "Name Tag",
 	Callback = function(self, Value: boolean)
@@ -1100,36 +1168,35 @@ end
 })
 
 
+local SelfSection = CreateRegion(Misc, "Self") 
+local FunSection = CreateRegion(Misc, "Fun") 
+local DiscordSection = CreateRegion(Misc, "Discord") 
 
 
 
 
 
-local Tab3 = Window:CreateTab({Name=`Other`})
-	Tab3:Label({
-		
-		Text = `other tab`
 
-		})
-
-
-
-Tab3:Checkbox({
+SelfSection:Checkbox({
 	Value = false,
 	Label = "NoClip",
 	Callback = function(self, Value: boolean)
 		if Value == true then
-			--enableFly()
+			startFlying()
 		end	
 		if Value == false then
-			--disableFly()
+			stopFlying()
 		end
 end
 })
 
 
 
-Tab3:Checkbox({
+
+
+
+
+FunSection:Checkbox({
 	Value = false,
 	Label = "Purple World",
 	Callback = function(self, Value: boolean)
@@ -1145,35 +1212,69 @@ end
 
 
 
-local Tab4 = Window:CreateTab({Name=`Settings`})
-	Tab4:Label({
+
+
+
+
+
+
+
+DiscordSection:Button({
+	Text = "Copy Link",
+	Callback = function()
 		
-		Text = `.gg/E4uF2TeSpe   [9009]`
-
-		})
-
-
-
-
-Tab4:Keybind({
-    Label = "Gui Key",
-    Value = Enum.KeyCode.Insert,
-    Callback = function(_, NewKeybind)
-        local IsVisible = Window.Visible
-        Window:SetVisible(not IsVisible)
-    end
+		setclipboard("https://discord.gg/E4uF2TeSpe")
+		
+	end,
 })
-local Settings = CreateTab("Setttings", ReGui.Icons.Settings)
 
-	
-	
+
+
+
+
+
+
+
+
+
+
+--// Settings
+local OptionsSection = CreateRegion(Settings, "Options") 
+local ConfigSection = CreateRegion(Settings, "Configurations") 
+
+OptionsSection:Keybind({
+	Label = "Show / Hide GUI",
+	Value = Enum.KeyCode.RightShift,
+	Callback = function(_, NewKeybind)
+		local IsVisible = Window.Visible
+		Window:SetVisible(not IsVisible)
+	end
+})
+
+OptionsSection:Button({
+	Text = "Unload Script",
+	Callback = function()
+		Window:Close()
+	end
+})
+
+--// Configurations
+ConfigSection:Combo({
+	Label = "Config",
+	Items = {
+		"Legit",
+		"Rage",
+		"Blatant"
+	},
+	Selected = 1,
+})
+
+
+
 end			-- Unsuccessful
 		else
 			Key:SetLabel("Wrong key!")
 		end
 	end,
 })
-
-
-
-end--nie zmieniac 
+end--rivals only
