@@ -66,6 +66,109 @@ Window1:Button({
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+--highlights
+local Players = game:GetService("Players")
+
+local highlights = {} -- Przechowuje referencje do Highlightów
+local highlightEnabled = true -- Kontroluje, czy Highlighty powinny być włączone
+
+local function createBoxAroundCharacter(character)
+    if not highlightEnabled then return end -- Jeśli Highlighty są wyłączone, nie dodawaj ich
+
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+    -- Usuń istniejący Highlight, aby uniknąć duplikatów
+    local existingHighlight = highlights[character]
+    if existingHighlight then
+        existingHighlight:Destroy()
+    end
+
+    -- Tworzenie nowego Highlight
+    local highlight = Instance.new("Highlight")
+    highlight.Adornee = character
+    highlight.Parent = character
+    highlight.FillColor = Color3.fromRGB(213, 52, 235)
+    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+
+    -- Przechowujemy Highlight w tabeli
+    highlights[character] = highlight
+end
+
+local function onPlayerAdded(player)
+    player.CharacterAdded:Connect(function(character)
+        task.wait(0.5) -- Czekamy, aż postać się wczyta
+        createBoxAroundCharacter(character)
+    end)
+end
+
+-- Funkcja włączająca podświetlenie
+local function enableHighlight()
+    highlightEnabled = true
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player.Character then
+            createBoxAroundCharacter(player.Character)
+        end
+    end
+end
+
+-- Funkcja wyłączająca podświetlenie
+local function disableHighlight()
+    highlightEnabled = false
+    for character, highlight in pairs(highlights) do
+        if highlight then
+            highlight:Destroy()
+        end
+    end
+    highlights = {} -- Czyści tabelę
+end
+
+-- Dodanie highlighta dla już obecnych graczy
+for _, player in ipairs(Players:GetPlayers()) do
+    if player.Character then
+        createBoxAroundCharacter(player.Character)
+    end
+    onPlayerAdded(player)
+end
+
+-- Obsługa nowych graczy
+Players.PlayerAdded:Connect(onPlayerAdded)
+
+-- Przykłady użycia:
+-- enableHighlight()  -- Włącza podświetlenie
+-- disableHighlight() -- Wyłącza podświetlenie
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 --Name ESP
 local Players = game:GetService("Players")
 
@@ -179,34 +282,31 @@ local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
--- Przechowujemy ESP Boxy
 local espBoxes = {}
+local MAX_DISTANCE = 250 -- Maksymalna odległość, w której ESP będzie wyświetlane
 
 local function createESPBox(player)
-    if player == LocalPlayer then return end -- Nie rysuj ESP dla siebie
+    if player == LocalPlayer then return end
 
     local box = Drawing.new("Square")
-    local outerBox1 = Drawing.new("Square") -- Zewnętrzna obwódka
-    local outerBox2 = Drawing.new("Square") -- Wewnętrzna obwódka
+    local outerBox1 = Drawing.new("Square")
+    local outerBox2 = Drawing.new("Square")
 
     local thickness = 2
-    local borderThickness = thickness * 0.5 -- Obwódka 0.5x cieńsza niż główny box
+    local borderThickness = thickness * 0.5 
 
-    -- Główne ESP Boxy (Białe)
     box.Thickness = thickness
-    box.Color = Color3.fromRGB(255, 255, 255) -- Biały kolor
+    box.Color = Color3.fromRGB(255, 255, 255)
     box.Filled = false
     box.Visible = false
 
-    -- Obwódka zewnętrzna (Czarna)
     outerBox1.Thickness = borderThickness
-    outerBox1.Color = Color3.fromRGB(0, 0, 0) -- Czarna obwódka
+    outerBox1.Color = Color3.fromRGB(0, 0, 0)
     outerBox1.Filled = false
     outerBox1.Visible = false
 
-    -- Obwódka wewnętrzna (Czarna)
     outerBox2.Thickness = borderThickness
-    outerBox2.Color = Color3.fromRGB(0, 0, 0) -- Czarna obwódka
+    outerBox2.Color = Color3.fromRGB(0, 0, 0)
     outerBox2.Filled = false
     outerBox2.Visible = false
 
@@ -214,32 +314,28 @@ local function createESPBox(player)
         if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
             local rootPart = player.Character.HumanoidRootPart
             local head = player.Character:FindFirstChild("Head")
+            local distance = (rootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
 
-            if head then
+            if head and distance <= MAX_DISTANCE then
                 local headPos, headOnScreen = Camera:WorldToViewportPoint(head.Position)
                 local rootPos, rootOnScreen = Camera:WorldToViewportPoint(rootPart.Position)
 
                 if headOnScreen and rootOnScreen then
-                    -- Obliczanie wysokości i szerokości boxu na podstawie pozycji głowy i ciała
                     local height = math.abs(headPos.Y - rootPos.Y)
-                    local width = height * 0.6 -- Dopasowanie proporcji do gracza
+                    local width = height * 0.6 
 
-                    -- Zwiększenie wysokości i szerokości boxów
                     local boxSize = Vector2.new(width * 3, height * 4)
                     local boxPos = Vector2.new(rootPos.X - boxSize.X / 2, rootPos.Y - boxSize.Y / 2)
 
                     box.Size = boxSize
                     box.Position = boxPos
-
-                    -- Obwódka na zewnątrz (większa)
+                    
                     outerBox1.Size = boxSize + Vector2.new(borderThickness * 2, borderThickness * 2)
                     outerBox1.Position = boxPos - Vector2.new(borderThickness, borderThickness)
 
-                    -- Obwódka wewnętrzna (mniejsza)
                     outerBox2.Size = boxSize - Vector2.new(borderThickness * 2, borderThickness * 2)
                     outerBox2.Position = boxPos + Vector2.new(borderThickness, borderThickness)
 
-                    -- Ustawienie widoczności
                     box.Visible = true
                     outerBox1.Visible = true
                     outerBox2.Visible = true
@@ -248,6 +344,10 @@ local function createESPBox(player)
                     outerBox1.Visible = false
                     outerBox2.Visible = false
                 end
+            else
+                box.Visible = false
+                outerBox1.Visible = false
+                outerBox2.Visible = false
             end
         else
             box.Visible = false
@@ -257,12 +357,9 @@ local function createESPBox(player)
     end
 
     RunService.RenderStepped:Connect(update)
-
-    -- Przechowujemy ESP Boxy w tabeli
     espBoxes[player.UserId] = {box = box, outerBox1 = outerBox1, outerBox2 = outerBox2}
 end
 
--- Funkcja włączająca ESP Boxy
 local function enableBox()
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and not espBoxes[player.UserId] then
@@ -271,34 +368,25 @@ local function enableBox()
     end
 end
 
--- Funkcja wyłączająca ESP Boxy
 local function disableBox()
     for _, player in pairs(Players:GetPlayers()) do
         local boxes = espBoxes[player.UserId]
         if boxes then
-            boxes.box:Remove()        -- Usuwa główny box
-            boxes.outerBox1:Remove()  -- Usuwa zewnętrzną obwódkę
-            boxes.outerBox2:Remove()  -- Usuwa wewnętrzną obwódkę
-            espBoxes[player.UserId] = nil  -- Usuwamy z tabeli
+            boxes.box:Remove()
+            boxes.outerBox1:Remove()
+            boxes.outerBox2:Remove()
+            espBoxes[player.UserId] = nil
         end
     end
 end
 
--- Dodanie ESP Boxów dla istniejących graczy
 for _, player in pairs(Players:GetPlayers()) do
     if player ~= LocalPlayer then
         createESPBox(player)
     end
 end
 
--- Dodanie ESP Boxów dla nowych graczy
-Players.PlayerAdded:Connect(function(player)
-    createESPBox(player)
-end)
-
--- Przykład użycia:
--- enableBox()  -- Włącza ESP Boxy dla wszystkich graczy
--- disableBox() -- Wyłącza ESP Boxy dla wszystkich graczy
+Players.PlayerAdded:Connect(createESPBox)
 
 
 
@@ -335,25 +423,26 @@ end)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
--- Przechowujemy informacje o Health Barach
 local healthBars = {}
+local healthEnabled = true -- Kontroluje, czy Health Bary powinny być włączone
 
 local function createHealthBar(player)
-    if player == Players.LocalPlayer then return end -- Pomija lokalnego gracza
+    if player == Players.LocalPlayer then return end
+    if not healthEnabled then return end -- Nie dodawaj, jeśli wyłączone
 
     local function onCharacterAdded(character)
-        local head = character:FindFirstChild("Head")
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if not healthEnabled then return end -- Nie dodawaj po respawnie, jeśli wyłączone
+
+        local head = character:WaitForChild("Head", 5)
+        local humanoid = character:WaitForChild("Humanoid", 5)
         if not head or not humanoid then return end
 
-        -- Tworzenie BillboardGui dla Health Bara
         local billboard = Instance.new("BillboardGui")
         billboard.Adornee = head
         billboard.Size = UDim2.new(1, 0, 3, 0)
-        billboard.StudsOffset = Vector3.new(2, -2, 0) -- Pasek zdrowia obok gracza (w prawo)
+        billboard.StudsOffset = Vector3.new(2, -2, 0)
         billboard.AlwaysOnTop = true
 
-        -- Tło paska zdrowia (czarne)
         local background = Instance.new("Frame")
         background.Size = UDim2.new(0.3, 0, 1, 0)
         background.Position = UDim2.new(0.5, 0, 0, 0)
@@ -362,70 +451,52 @@ local function createHealthBar(player)
         background.BorderSizePixel = 0
         background.Parent = billboard
 
-        -- Pasek zdrowia (dynamiczny)
         local healthBar = Instance.new("Frame")
         healthBar.Size = UDim2.new(1, 0, 1, 0)
-        healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Zielony pasek
+        healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
         healthBar.BorderSizePixel = 0
-        healthBar.Position = UDim2.new(0, 0, 1, 0) -- Startuje na dole
+        healthBar.Position = UDim2.new(0, 0, 1, 0)
         healthBar.AnchorPoint = Vector2.new(0, 1)
         healthBar.Parent = background
 
-        -- Aktualizacja paska zdrowia
         local function updateHealth()
             if humanoid and healthBar then
                 local healthPercent = humanoid.Health / humanoid.MaxHealth
                 healthBar.Size = UDim2.new(1, 0, healthPercent, 0)
 
-                -- Zmiana koloru w zależności od HP
                 if healthPercent > 0.6 then
-                    healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Zielony
+                    healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
                 elseif healthPercent > 0.3 then
-                    healthBar.BackgroundColor3 = Color3.fromRGB(255, 165, 0) -- Pomarańczowy
+                    healthBar.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
                 else
-                    healthBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Czerwony
+                    healthBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
                 end
             end
         end
 
-        -- Aktualizuje pasek zdrowia co klatkę
         local connection
         connection = RunService.RenderStepped:Connect(function()
-            if humanoid.Health <= 0 then
-                connection:Disconnect() -- Przestaje aktualizować po śmierci
-                billboard:Destroy() -- Usuwa pasek zdrowia
+            if not humanoid.Parent or humanoid.Health <= 0 then
+                connection:Disconnect()
+                billboard:Destroy()
+                healthBars[player.UserId] = nil
             else
                 updateHealth()
             end
         end)
 
         billboard.Parent = character
-
-        -- Przechowywanie BillboardGui (Health Bar) w tabeli
         healthBars[player.UserId] = billboard
     end
 
-    -- Jeśli gracz ma już postać, dodajemy Health Bar
+    player.CharacterAdded:Connect(onCharacterAdded)
     if player.Character then
         onCharacterAdded(player.Character)
     end
-
-    -- Nasłuchiwanie na odradzanie się gracza
-    player.CharacterAdded:Connect(onCharacterAdded)
 end
 
--- Dodajemy Health Bar dla istniejących graczy
-for _, player in pairs(Players:GetPlayers()) do
-    createHealthBar(player)
-end
-
--- Dodajemy Health Bar dla nowych graczy
-Players.PlayerAdded:Connect(function(player)
-    createHealthBar(player)
-end)
-
--- Funkcja włączająca Health Bar ESP dla gracza
 local function enableHealth()
+    healthEnabled = true
     for _, player in pairs(Players:GetPlayers()) do
         if not healthBars[player.UserId] then
             createHealthBar(player)
@@ -433,20 +504,26 @@ local function enableHealth()
     end
 end
 
--- Funkcja wyłączająca Health Bar ESP dla gracza
 local function disableHealth()
-    for _, player in pairs(Players:GetPlayers()) do
-        local billboard = healthBars[player.UserId]
+    healthEnabled = false
+    for userId, billboard in pairs(healthBars) do
         if billboard then
-            billboard:Destroy()  -- Usuwamy Health Bar
-            healthBars[player.UserId] = nil  -- Usuwamy z tabeli
+            billboard:Destroy()
         end
     end
+    healthBars = {} -- Czyścimy tabelę
 end
 
--- Przykład wywołania: Możesz włączyć lub wyłączyć Health Bar ESP
--- enableHealth()  -- Włącza Health Bar dla wszystkich graczy
--- disableHealth() -- Wyłącza Health Bar dla wszystkich graczy
+for _, player in pairs(Players:GetPlayers()) do
+    createHealthBar(player)
+end
+
+Players.PlayerAdded:Connect(createHealthBar)
+
+-- Przykłady użycia:
+-- enableHealth()  -- Włącza paski zdrowia
+-- disableHealth() -- Wyłącza paski zdrowia
+
 
 
 
@@ -485,12 +562,12 @@ if not sky then
 end
 
 -- Ustawienie fioletowego nieba
-sky.SkyboxUp = "rbxassetid://653735694"   -- Tekstura nieba (możesz zmienić ID)
-sky.SkyboxDn = "rbxassetid://653735694"
-sky.SkyboxLf = "rbxassetid://653735694"
-sky.SkyboxRt = "rbxassetid://653735694"
-sky.SkyboxFt = "rbxassetid://653735694"
-sky.SkyboxBk = "rbxassetid://653735694"
+--sky.SkyboxUp = "rbxassetid://653735694"   -- Tekstura nieba (możesz zmienić ID)
+--sky.SkyboxDn = "rbxassetid://653735694"
+--sky.SkyboxLf = "rbxassetid://653735694"
+--sky.SkyboxRt = "rbxassetid://653735694"
+--sky.SkyboxFt = "rbxassetid://653735694"
+--sky.SkyboxBk = "rbxassetid://653735694"
 
 -- Możesz też zmienić kolor otoczenia dla lepszego efektu
 Lighting.Ambient = Color3.fromRGB(128, 0, 128)  -- Fioletowe oświetlenie
@@ -511,12 +588,12 @@ if not sky then
 end
 
 -- Ustawienie fioletowego nieba
-sky.SkyboxUp = "rbxassetid://6412503613"   -- Tekstura nieba (możesz zmienić ID)
-sky.SkyboxDn = "rbxassetid://6444884785"
-sky.SkyboxLf = "rbxassetid://6444884337"
-sky.SkyboxRt = "rbxassetid://6444884337"
-sky.SkyboxFt = "rbxassetid://6444884337"
-sky.SkyboxBk = "rbxassetid://6444884337"
+--sky.SkyboxUp = "rbxassetid://6412503613"   -- Tekstura nieba (możesz zmienić ID)
+--sky.SkyboxDn = "rbxassetid://6444884785"
+--sky.SkyboxLf = "rbxassetid://6444884337"
+--sky.SkyboxRt = "rbxassetid://6444884337"
+--sky.SkyboxFt = "rbxassetid://6444884337"
+--sky.SkyboxBk = "rbxassetid://6444884337"
 
 -- Możesz też zmienić kolor otoczenia dla lepszego efektu
 Lighting.Ambient = Color3.fromRGB(128, 128, 128)  -- Fioletowe oświetlenie
@@ -1067,50 +1144,12 @@ MainSection:Checkbox({
 	Label = "HighLights",
 	Callback = function(self, Value: boolean)
 		if Value == true then
-											local Players = game:GetService("Players")
-
-											local function createBoxAroundCharacter(character)
-												-- Sprawdź, czy postać istnieje
-												if not character or not character:FindFirstChild("HumanoidRootPart") then return end
-
-												-- Usuń istniejący Highlight, aby uniknąć duplikatów
-												local existingHighlight = character:FindFirstChildOfClass("Highlight")
-												if existingHighlight then
-													existingHighlight:Destroy()
-												end
-
-												-- Tworzenie nowego Highlight
-												local highlight = Instance.new("Highlight")
-												highlight.Adornee = character
-												highlight.Parent = character
-												highlight.FillColor = Color3.fromRGB(213, 52, 235) 
-												highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-											end
-
-											local function onPlayerAdded(player)
-												-- Nasłuchuj, kiedy postać zostanie dodana
-												player.CharacterAdded:Connect(function(character)
-													-- Odczekaj chwilę, aby upewnić się, że postać została załadowana
-													task.wait(0.5)
-													createBoxAroundCharacter(character)
-												end)
-											end
-
-											-- Dodanie highlighta dla już obecnych graczy
-											for _, player in ipairs(Players:GetPlayers()) do
-												if player.Character then
-													createBoxAroundCharacter(player.Character)
-												end
-												onPlayerAdded(player)
-											end
-
-											-- Obsługa nowych graczy
-											Players.PlayerAdded:Connect(onPlayerAdded)
-
+										
+			enableHighlight()
 
 		end
 		if Value == false then
-		loadstring(game:HttpGet("https://pastebin.com/raw/EYdMXKW1"))()
+			disableHighlight()		--loadstring(game:HttpGet("https://pastebin.com/raw/EYdMXKW1"))()
 		end
 	
 	end
