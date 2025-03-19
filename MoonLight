@@ -1,4 +1,87 @@
 if game.PlaceId == 17625359962 then
+
+
+local players = game:GetService("Players")
+local player = players.LocalPlayer
+
+-- Tworzenie głównego GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "LoadingScreen"
+screenGui.Parent = player:FindFirstChild("PlayerGui") or player:WaitForChild("PlayerGui")
+screenGui.IgnoreGuiInset = true
+screenGui.ResetOnSpawn = false -- Nie resetuje się po respawnie
+
+-- Tworzenie tła (ciemne z fioletowym gradientem)
+local background = Instance.new("Frame")
+background.Size = UDim2.new(0, 300, 0, 200)  -- 300x200 pikseli (około 15x10 cm)
+background.Position = UDim2.new(0.5, -150, 0, -200) -- Początkowo poza ekranem, schodzi z góry
+background.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+background.BorderSizePixel = 0
+background.Parent = screenGui
+
+-- Gradient efektu cienia
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 0, 150)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 30))
+}
+gradient.Rotation = 90
+gradient.Parent = background
+
+-- Zaokrąglenie rogów
+local uicorner = Instance.new("UICorner")
+uicorner.CornerRadius = UDim.new(0.1, 0)
+uicorner.Parent = background
+
+-- Napis "Welcome to MoonLight"
+local textLabel = Instance.new("TextLabel")
+textLabel.Size = UDim2.new(0.6, 0, 0.1, 0)
+textLabel.Position = UDim2.new(0.2, 0, 0.3, 0)
+textLabel.Text = "Welcome to MoonLight"
+textLabel.TextColor3 = Color3.fromRGB(200, 180, 255)
+textLabel.Font = Enum.Font.GothamBold
+textLabel.TextSize = 24  -- Zmniejszyliśmy rozmiar tekstu do 24
+textLabel.BackgroundTransparency = 1
+textLabel.Parent = background
+
+-- Pasek ładowania (kontener)
+local loadingBarBg = Instance.new("Frame")
+loadingBarBg.Size = UDim2.new(0.6, 0, 0.05, 0)
+loadingBarBg.Position = UDim2.new(0.2, 0, 0.5, 0)
+loadingBarBg.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+loadingBarBg.BorderSizePixel = 0
+loadingBarBg.Parent = background
+
+local uicornerBarBg = Instance.new("UICorner")
+uicornerBarBg.CornerRadius = UDim.new(1, 0)
+uicornerBarBg.Parent = loadingBarBg
+
+-- Pasek ładowania (wypełnienie)
+local loadingBar = Instance.new("Frame")
+loadingBar.Size = UDim2.new(0, 0, 1, 0)
+loadingBar.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
+loadingBar.BorderSizePixel = 0
+loadingBar.Parent = loadingBarBg
+
+local uicornerBar = Instance.new("UICorner")
+uicornerBar.CornerRadius = UDim.new(1, 0)
+uicornerBar.Parent = loadingBar
+
+-- **Animacja schodzenia GUI z góry**
+background:TweenPosition(UDim2.new(0.5, -150, 0.5, -100), "Out", "Quint", 1.5, true)
+
+-- **Animacja ładowania**
+for i = 1, 100 do
+    loadingBar:TweenSize(UDim2.new(i/100, 0, 1, 0), "Out", "Quint", 0.03, true)
+    wait(0.03)
+end
+
+-- **Znikanie GUI po załadowaniu**
+wait(1)
+screenGui:Destroy()
+
+
+
 local ReGui = loadstring(game:HttpGet('https://raw.githubusercontent.com/depthso/Dear-ReGui/refs/heads/main/ReGui.lua'))()
 local PrefabsId = `rbxassetid://{ReGui.PrefabsId}`
 
