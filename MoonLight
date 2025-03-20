@@ -1060,11 +1060,26 @@ end
 
 
 --// Tabs
+local players = game:GetService("Players")
+local playerName = players.LocalPlayer.Name
+
+-- Sprawdzamy, czy nazwa gracza to jedna z określonych nazw
+local title = "MoonLight | Logged as: " .. playerName
+
+-- Warunek, który dodaje "[Owner]" do tytułu, jeśli gracz to jeden z określonych
+if playerName == "9009TestH1K0" or playerName == "9009testJog1" then
+    title = title .. " [Owner]"
+else
+    -- Dla innych graczy dodajemy "[Customer]"
+    title = title .. " [User]"
+end
+
+-- Tworzenie okna z tytułem zawierającym nazwę użytkownika
 local Window = ReGui:Window({
-	Title = "MoonLight",
-	Theme = "Cherry",
-	NoClose = true,
-	Size = UDim2.new(0, 600, 0, 400),
+    Title = title,  -- Ustawiamy dynamiczny tytuł z nazwą gracza
+    Theme = "Cherry",
+    NoClose = true,
+    Size = UDim2.new(0, 600, 0, 400),
 }):Center()
 
 local ModalWindow = Window:PopupModal({
