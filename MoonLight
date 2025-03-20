@@ -1088,7 +1088,7 @@ local ModalWindow = Window:PopupModal({
 })
 
 ModalWindow:Label({
-	Text = [[Last Update : 19.03.2025]],
+	Text = [[Last Update : 20.03.2025]],
 	TextWrapped = true
 })
 ModalWindow:Separator()
